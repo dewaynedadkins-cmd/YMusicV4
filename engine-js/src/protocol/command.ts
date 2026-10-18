@@ -52,7 +52,7 @@ export class JsEngineErrorImpl extends Error {
     return new JsEngineErrorImpl(message + " HTTP " + status, transient ? "network" : siteCode);
   }
 }
-globalThis.JsEngineError = JsEngineErrorImpl;
+JsEngineErrorImpl satisfies JsEngineErrorConstructor;
 
 // A thrown value as classify sees it: anything, probed field by field.
 interface ThrownLike {
@@ -132,8 +132,6 @@ export function commandHandler(handler: CommandHandlerFn): (pipe: Pipe) => Promi
     }
   };
 }
-// Global mirror for externally-evaled JS (dev/debug); in-bundle code imports. Mangles in Closure.
-globalThis.commandHandler = commandHandler;
 
 // ---- the caller half of the contract: open a host command, decode its RESET ----
 

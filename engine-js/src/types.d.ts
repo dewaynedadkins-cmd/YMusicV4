@@ -159,13 +159,8 @@ interface JsEngineErrorConstructor {
   httpStatus(message: string, status: number, siteCode: string): JsEngineError;
 }
 
-declare var JsEngineError: JsEngineErrorConstructor;
-
 /** A call handler: reads its own head off `src` (format not assumed), writes the result to `out`. */
 type CommandHandlerFn = (src: PipeSource, out: PipeSink, pipe: Pipe) => void | Promise<void>;
-
-/** Wrap a call handler in the error contract, producing a pipe handler for ymix.onAccept. */
-declare var commandHandler: (handler: CommandHandlerFn) => (pipe: Pipe) => Promise<void>;
 
 // ---- HTTP (protocol/http.ts; host side: HttpProtocol.kt) ----
 
@@ -221,7 +216,7 @@ interface HttpRequestBuilder {
   build(): HttpCall;
 }
 
-declare var HttpRequest: {
+interface HttpRequestApi {
   get(url: string): HttpRequestBuilder;
   post(url: string): HttpRequestBuilder;
   put(url: string): HttpRequestBuilder;
@@ -230,7 +225,7 @@ declare var HttpRequest: {
   head(url: string): HttpRequestBuilder;
   method(m: string, url: string): HttpRequestBuilder;
   addInterceptor(fn: import("./protocol/http/intercept").HttpInterceptor): { remove(): void };
-};
+}
 
 // WHATWG fetch (logic/yt/fetch.ts) — quoted names at runtime for eval'd base.js.
 // In-bundle callers must use bracket access so Closure does not rename them apart.
