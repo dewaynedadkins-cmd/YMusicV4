@@ -69,10 +69,8 @@ class AndroidAppUpdates(
     /** The sha256 of the release whose automatic download failed ("" for none), and its setter. */
     private val autoDownloadFailed: () -> String,
     private val rememberAutoDownloadFailed: suspend (sha256: String) -> Unit,
-    /** Fetch the config now, ignoring its throttle; false when that failed. */
-    private val refreshConfig: suspend () -> Boolean,
-    /** The config's current update entry. */
-    private val latestUpdate: suspend () -> AppUpdate?,
+    /** The update entry of a freshly fetched config, or of the one held when none arrives in time. */
+    private val freshUpdate: suspend () -> AppUpdate?,
     /** The config's official download site, if it names one. */
     private val downloadSite: () -> String?,
     /** The config's update entry, every time the config changes. */
@@ -315,8 +313,7 @@ class AndroidAppUpdates(
     }
 
     override suspend fun checkNow(): UpdateCheck {
-        if (!refreshConfig()) return UpdateCheck.Failed
-        accept(latestUpdate())
+        accept(freshUpdate())
         return if (offer.value == null) UpdateCheck.UpToDate else UpdateCheck.Found
     }
 

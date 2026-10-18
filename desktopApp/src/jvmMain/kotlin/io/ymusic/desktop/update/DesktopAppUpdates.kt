@@ -21,10 +21,8 @@ import kotlin.system.exitProcess
 class DesktopAppUpdates(
     private val service: UpdateService,
     private val scope: CoroutineScope,
-    /** Fetch the config now, ignoring its throttle; false when that failed. */
-    private val refreshConfig: suspend () -> Boolean,
-    /** The config's current update entry. */
-    private val latestUpdate: suspend () -> AppUpdate?,
+    /** The update entry of a freshly fetched config, or of the one held when none arrives in time. */
+    private val freshUpdate: suspend () -> AppUpdate?,
     /** The config's official download site, if it names one. */
     private val downloadSite: () -> String?,
 ) : AppUpdates {
@@ -60,8 +58,7 @@ class DesktopAppUpdates(
     )
 
     override suspend fun checkNow(): UpdateCheck {
-        if (!refreshConfig()) return UpdateCheck.Failed
-        service.accept(latestUpdate())
+        service.accept(freshUpdate())
         return if (service.hasOffer) UpdateCheck.Found else UpdateCheck.UpToDate
     }
 
